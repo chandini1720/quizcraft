@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizCraft AI Pro - Multi-Format Quiz Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+  <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold bg-gradient-to-r from-violet-400 to-indigo-500 bg-clip-text text-transparent cursor-pointer" onclick="showSection('creator-section')">
+        QuizCraft
+      </h1>
+      <span class="text-xs text-slate-500 font-mono">v5.0.0 (Multi-Format Support)</span>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    
+    <section id="creator-section" class="space-y-6">
+      <div class="space-y-2">
+        <h2 class="text-3xl font-extrabold tracking-tight">Create a Quiz</h2>
+        <p class="text-slate-400">Build interactive quizzes with MCQs, True/False, or Fill-in-the-blank questions.</p>
+      </div>
+
+      <div class="bg-slate-950 p-6 rounded-xl border border-indigo-500/30 space-y-4 shadow-lg shadow-indigo-500/5">
+        <div class="flex items-center gap-2 text-indigo-400">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          <h3 class="text-sm font-bold uppercase tracking-wider font-mono">AI Generation Engine</h3>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold mb-1 text-slate-400">Topic or Subject</label>
+            <input type="text" id="ai-topic" placeholder="e.g., JavaScript Arrays, World War I, Basic Chemistry" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-slate-400">Question Format</label>
+            <select id="ai-format" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 transition">
+              <option value="MCQ">Multiple Choice (MCQ)</option>
+              <option value="TF">True / False</option>
+              <option value="FITB">Fill in the Blank</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-slate-400">No. of Questions</label>
+            <select id="ai-count" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 transition">
+              <option value="3">3 Questions</option>
+              <option value="5" selected>5 Questions</option>
+              <option value="10">10 Questions</option>
+            </select>
+          </div>
+        </div>
+
+        <button onclick="generateAIQuiz()" id="generate-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-lg text-sm font-semibold transition flex justify-center items-center gap-2">
+          Generate Quiz Instantly
+        </button>
+      </div>
+
+      <hr class="border-slate-800 my-6">
+
+      <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4">
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-slate-300">Quiz Title</label>
+          <input type="text" id="quiz-title" placeholder="e.g., Web Development Masterclass" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-slate-100 focus:outline-none focus:border-indigo-500 transition">
+        </div>
+      </div>
+
+      <div id="questions-container" class="space-y-6">
+        </div>
+
+      <div class="flex flex-wrap gap-4">
+        <div class="flex gap-2">
+          <button onclick="addQuestion('MCQ')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-lg font-medium transition text-xs">
+            + MCQ
+          </button>
+          <button onclick="addQuestion('TF')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-lg font-medium transition text-xs">
+            + True/False
+          </button>
+          <button onclick="addQuestion('FITB')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-lg font-medium transition text-xs">
+            + Fill Blank
+          </button>
+        </div>
+        <button onclick="publishQuiz()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-lg font-semibold transition text-sm ml-auto">
+          Publish & Share
+        </button>
+      </div>
+    </section>
+
+    <section id="share-section" class="hidden space-y-6 text-center py-12">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-400 mb-4 border border-emerald-500/20">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+      </div>
+      <h2 class="text-3xl font-extrabold">Your Quiz is Deployed!</h2>
+      <p class="text-slate-400 max-w-md mx-auto">Copy the link parameters below to share this browser link with others.</p>
+      
+      <div class="max-w-md mx-auto flex gap-2 bg-slate-950 p-2 rounded-lg border border-slate-800">
+        <input type="text" id="share-url" readonly class="bg-transparent flex-1 px-3 text-sm focus:outline-none text-indigo-400 font-mono">
+        <button onclick="copyShareLink()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-md text-sm font-semibold transition shrink-0">
+          Copy Link
+        </button>
+      </div>
+      <div class="pt-4">
+        <button onclick="tryQuizSelf()" class="text-sm text-slate-500 hover:text-slate-300 underline underline-offset-4">
+          Test your quiz layout now →
+        </button>
+      </div>
+    </section>
+
+    <section id="player-section" class="hidden space-y-6">
+      <div class="border-b border-slate-800 pb-4">
+        <h2 id="player-quiz-title" class="text-3xl font-extrabold text-slate-100">Quiz Active</h2>
+        <p class="text-xs text-slate-500 font-mono mt-1">Submit your answers below to view your results</p>
+      </div>
+      <div id="player-questions" class="space-y-6"></div>
+      <button onclick="submitQuiz()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-lg font-bold transition">
+        Submit My Answers
+      </button>
+    </section>
+
+    <section id="results-section" class="hidden text-center py-12 space-y-6">
+      <h2 class="text-4xl font-black">Quiz Finished!</h2>
+      <div class="max-w-sm mx-auto bg-slate-950 p-8 rounded-2xl border border-slate-800">
+        <p id="score-display" class="text-6xl font-extrabold text-indigo-400 my-4">0/0</p>
+        <p id="score-percentage" class="text-sm text-slate-500">0% correct</p>
+      </div>
+      <button onclick="showSection('creator-section'); resetCreator();" class="bg-slate-800 hover:bg-slate-700 px-6 py-2.5 rounded-lg font-semibold transition">
+        Create Another Quiz
+      </button>
+    </section>
+
+  </main>
+
+  <script>
+    let questionCount = 0;
+    let activeQuiz = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const quizParam = urlParams.get('quiz');
+      if (quizParam) {
+        loadQuiz(quizParam);
+      } else {
+        addQuestion('MCQ');
+      }
+    });
+
+    function showSection(sectionId) {
+      document.getElementById('creator-section').classList.add('hidden');
+      document.getElementById('share-section').classList.add('hidden');
+      document.getElementById('player-section').classList.add('hidden');
+      document.getElementById('results-section').classList.add('hidden');
+      document.getElementById(sectionId).classList.remove('hidden');
+    }
+
+    // Dynamic AI Prompt tuning based on different types of formats
+    async function generateAIQuiz() {
+      const topic = document.getElementById('ai-topic').value.trim();
+      const format = document.getElementById('ai-format').value;
+      const count = document.getElementById('ai-count').value;
+      const btn = document.getElementById('generate-btn');
+
+      if (!topic) {
+        alert("Please specify a topic.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Querying Open-Source LLM Models (Takes ~10-15s)...";
+      btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+      const apiEndpoint = 'https://text.pollinations.ai/';
+      
+      let formatRequirement = '';
+      if (format === 'MCQ') {
+        formatRequirement = 'Multiple Choice Questions. Provide 4 unique options in the "options" array, and set "correctAnswerIndex" to the correct item index (0-3).';
+      } else if (format === 'TF') {
+        formatRequirement = 'True or False Questions. The "options" array must strictly contain exactly ["True", "False"]. Set "correctAnswerIndex" to 0 for True or 1 for False.';
+      } else if (format === 'FITB') {
+        formatRequirement = 'Fill in the Blank Questions. Leave the "options" array completely empty []. Instead, provide a single field "correctText" containing the exact string answer.';
+      }
+
+      const structuredPrompt = `Create exactly ${count} quiz questions about "${topic}". The format style must strictly represent ${formatRequirement}. You must respond ONLY with a raw JSON array string. No introductory text, no markdown styling tags like \`\`\`json. 
+
+      Follow this exact schema architecture strictly:
+      [
+        {
+          "type": "${format}",
+          "questionText": "Question description?",
+          "options": ["Ans 1", "Ans 2", "Ans 3", "Ans 4"], 
+          "correctAnswerIndex": 0,
+          "correctText": "Written answer value if FITB type"
+        }
+      ]`;
+
+      try {
+        const response = await fetch(`${apiEndpoint}${encodeURIComponent(structuredPrompt)}`);
+        if (!response.ok) throw new Error("AI Stream failure.");
+        
+        let rawText = await response.text();
+        rawText = rawText.trim();
+
+        if (rawText.startsWith("```json")) rawText = rawText.replace(/```json|```/g, "").trim();
+        if (rawText.startsWith("```")) rawText = rawText.replace(/```/g, "").trim();
+
+        const questionsArray = JSON.parse(rawText);
+
+        document.getElementById('quiz-title').value = `${topic} Quiz (${format})`;
+        const container = document.getElementById('questions-container');
+        container.innerHTML = '';
+        questionCount = 0;
+
+        questionsArray.forEach(q => renderQuestionCard(q.type || format, q.questionText, q.options, q.correctAnswerIndex, q.correctText));
+      } catch (err) {
+        console.error(err);
+        alert("The model generated an unsupported configuration. Please click Generate again to restart the process.");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Generate Quiz Instantly";
+        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+      }
+    }
+
+    function addQuestion(type = 'MCQ') {
+      if (type === 'MCQ') {
+        renderQuestionCard('MCQ', "", ["", "", "", ""], 0, "");
+      } else if (type === 'TF') {
+        renderQuestionCard('TF', "", ["True", "False"], 0, "");
+      } else {
+        renderQuestionCard('FITB', "", [], -1, "");
+      }
+    }
+
+    // Dynamic Render Architecture for different structures (MCQ, True/False, Fill in the Blank)
+    function renderQuestionCard(type, text = "", options = [], targetIndex = 0, correctText = "") {
+      questionCount++;
+      const container = document.getElementById('questions-container');
+      const card = document.createElement('div');
+      card.className = "bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4 relative question-card";
+      card.id = `q-card-${questionCount}`;
+      card.dataset.type = type;
+
+      let formatBadgeColor = "text-indigo-400 bg-indigo-400/10 border-indigo-400/20";
+      let formatLabel = "Multiple Choice";
+      if (type === 'TF') {
+        formatBadgeColor = "text-amber-400 bg-amber-400/10 border-amber-400/20";
+        formatLabel = "True / False";
+      } else if (type === 'FITB') {
+        formatBadgeColor = "text-emerald-400 bg-emerald-400/10 border-emerald-400/20";
+        formatLabel = "Fill in the Blank";
+      }
+
+      let optionsHTML = '';
+
+      if (type === 'MCQ') {
+        optionsHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            ${[0, 1, 2, 3].map(i => `
+              <div class="flex items-center gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                <input type="radio" name="correct-${questionCount}" value="${i}" ${i === targetIndex ? 'checked' : ''} class="w-4 h-4 text-indigo-600 bg-slate-950 border-slate-800">
+                <input type="text" value="${options[i] || ''}" placeholder="Option ${i + 1}" class="opt-${i} bg-transparent flex-1 text-sm text-slate-200 focus:outline-none">
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (type === 'TF') {
+        optionsHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex items-center gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+              <input type="radio" name="correct-${questionCount}" value="0" ${targetIndex === 0 ? 'checked' : ''} class="w-4 h-4 text-indigo-600">
+              <span class="text-sm font-semibold text-slate-300">True</span>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+              <input type="radio" name="correct-${questionCount}" value="1" ${targetIndex === 1 ? 'checked' : ''} class="w-4 h-4 text-indigo-600">
+              <span class="text-sm font-semibold text-slate-300">False</span>
+            </div>
+          </div>
+        `;
+      } else if (type === 'FITB') {
+        optionsHTML = `
+          <div class="space-y-1">
+            <label class="block text-xs font-semibold text-slate-400">Correct Answer Match (Case-insensitive)</label>
+            <input type="text" value="${correctText}" placeholder="Enter the exact answer string..." class="fitb-text w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 transition">
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono text-slate-500">Question #${questionCount}</span>
+            <span class="text-xxs px-2 py-0.5 rounded border ${formatBadgeColor} font-bold font-mono tracking-wider uppercase">${formatLabel}</span>
+          </div>
+          <button onclick="removeQuestion(${questionCount})" class="text-slate-500 hover:text-red-400 text-xs">Remove</button>
+        </div>
+        <input type="text" value="${text}" placeholder="Enter question description..." class="q-text w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-slate-100 focus:outline-none focus:border-indigo-500 transition">
+        ${optionsHTML}
+      `;
+      container.appendChild(card);
+    }
+
+    function removeQuestion(id) {
+      if (document.querySelectorAll('.question-card').length > 1) {
+        document.getElementById(`q-card-${id}`).remove();
+      }
+    }
+
+    function publishQuiz() {
+      const title = document.getElementById('quiz-title').value.trim() || "Local Dynamic Quiz Setup";
+      const cards = document.querySelectorAll('.question-card');
+      const questions = [];
+
+      cards.forEach(card => {
+        const type = card.dataset.type;
+        const questionText = card.querySelector('.q-text').value.trim();
+        if (!questionText) return;
+
+        const questionPayload = { type, questionText };
+
+        if (type === 'MCQ') {
+          const options = [];
+          for (let i = 0; i < 4; i++) {
+            options.push(card.querySelector(`.opt-${i}`).value.trim() || `Option ${i + 1}`);
+          }
+          questionPayload.options = options;
+          questionPayload.correctAnswerIndex = parseInt(card.querySelector(`input[type="radio"]:checked`).value);
+        } else if (type === 'TF') {
+          questionPayload.options = ["True", "False"];
+          questionPayload.correctAnswerIndex = parseInt(card.querySelector(`input[type="radio"]:checked`).value);
+        } else if (type === 'FITB') {
+          questionPayload.correctText = card.querySelector('.fitb-text').value.trim();
+        }
+
+        questions.push(questionPayload);
+      });
+
+      if (questions.length === 0) {
+        alert("Please add at least one complete question.");
+        return;
+      }
+
+      const id = 'qz_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem(id, JSON.stringify({ id, title, questions }));
+
+      document.getElementById('share-url').value = `${window.location.origin}${window.location.pathname}?quiz=${id}`;
+      showSection('share-section');
+    }
+
+    function copyShareLink() {
+      document.getElementById('share-url').select();
+      document.execCommand('copy');
+      alert("Share URL written safely to clipboard!");
+    }
+
+    function tryQuizSelf() {
+      const id = document.getElementById('share-url').value.split('?quiz=')[1];
+      loadQuiz(id);
+    }
+
+    // Dynamic Player Rendering for All Three Types
+    function loadQuiz(quizId) {
+      const cachedData = localStorage.getItem(quizId);
+      if (!cachedData) {
+        showSection('creator-section');
+        return;
+      }
+
+      activeQuiz = JSON.parse(cachedData);
+      document.getElementById('player-quiz-title').innerText = activeQuiz.title;
+
+      const playerContainer = document.getElementById('player-questions');
+      playerContainer.innerHTML = '';
+
+      activeQuiz.questions.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4";
+        card.dataset.type = q.type;
+
+        let playerOptionsHTML = '';
+
+        if (q.type === 'MCQ' || q.type === 'TF') {
+          playerOptionsHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              ${q.options.map((opt, oIndex) => `
+                <label class="flex items-center gap-3 bg-slate-900 hover:bg-slate-800 p-3.5 rounded-lg border border-slate-800 cursor-pointer transition">
+                  <input type="radio" name="answer-${qIndex}" value="${oIndex}" class="w-4 h-4 text-indigo-600">
+                  <span class="text-sm text-slate-200">${opt}</span>
+                </label>
+              `).join('')}
+            </div>
+          `;
+        } else if (q.type === 'FITB') {
+          playerOptionsHTML = `
+            <div>
+              <input type="text" id="answer-fitb-${qIndex}" placeholder="Type your answer here..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 transition">
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <h3 class="text-lg font-bold">${qIndex + 1}. ${q.questionText}</h3>
+          ${playerOptionsHTML}
+        `;
+        playerContainer.appendChild(card);
+      });
+
+      showSection('player-section');
+    }
+
+    // Dynamic Scoring Logic based on formats
+    function submitQuiz() {
+      let score = 0;
+      activeQuiz.questions.forEach((q, qIndex) => {
+        if (q.type === 'MCQ' || q.type === 'TF') {
+          const selected = document.querySelector(`input[name="answer-${qIndex}"]:checked`);
+          if (selected && parseInt(selected.value) === q.correctAnswerIndex) {
+            score++;
+          }
+        } else if (q.type === 'FITB') {
+          const typedVal = document.getElementById(`answer-fitb-${qIndex}`).value.trim().toLowerCase();
+          const targetAnswer = q.correctText.trim().toLowerCase();
+          if (typedVal && typedVal === targetAnswer) {
+            score++;
+          }
+        }
+      });
+
+      document.getElementById('score-display').innerText = `${score} / ${activeQuiz.questions.length}`;
+      document.getElementById('score-percentage').innerText = `${Math.round((score / activeQuiz.questions.length) * 100)}% Correct`;
+      showSection('results-section');
+    }
+
+    function resetCreator() {
+      document.getElementById('quiz-title').value = '';
+      document.getElementById('ai-topic').value = '';
+      document.getElementById('questions-container').innerHTML = '';
+      questionCount = 0;
+      addQuestion('MCQ');
+      window.history.pushState({}, document.title, window.location.pathname);
+    }
+  </script>
+</body>
+</html>
